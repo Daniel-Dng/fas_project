@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 
 
-def get_head_pose(cap, fa):
+def get_face_pos(cap, fa):
     ret, frame = cap.read()
     frame_height, frame_width, frame_channel = frame.shape
     face_3d = []
@@ -40,13 +40,13 @@ def get_head_pose(cap, fa):
         y = angles[1] * 360
         z = angles[2] * 360
         # See where the user's head tilting
-        if y < -10:
+        if y < -15:
             head_pose = "left"
-        elif y > 10:
+        elif y > 15:
             head_pose = "right"
-        elif x < -10:
+        elif x < -15:
             head_pose = "down"
-        elif x > 10:
+        elif x > 15:
             head_pose = "up"
         else:
             head_pose = "forward"
@@ -65,4 +65,4 @@ def get_head_pose(cap, fa):
         #     connections=mp.solutions.face_mesh.FACEMESH_TESSELATION,
         #     landmark_drawing_spec=drawing_spec,
         #     connection_drawing_spec=drawing_spec)
-    return head_pose
+    return head_pose, (x, y, z)
