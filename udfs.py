@@ -68,12 +68,11 @@ def get_face_pos(cap, fa):
     return head_pose, (x, y, z)
 
 
-from FaceAnalyzer import FaceAnalyzer
+# from FaceAnalyzer import FaceAnalyzer
+# fa = FaceAnalyzer(max_nb_faces=1)
 
-fa = FaceAnalyzer(max_nb_faces=1)
 
-
-def get_head_pose_from_frame(frame):
+def get_head_pose_from_frame(fa, frame):
     fa.process(frame)
     frame_height, frame_width, frame_channel = frame.shape
     face_3d = []

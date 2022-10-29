@@ -1,6 +1,3 @@
-import time
-
-
 def question_bank(index):
     questions = [
         "blink eyes",
@@ -50,3 +47,5 @@ def challenge_result(question, face_instance, blinks_up):
         else:
             challenge = "fail"
     return challenge
+
+# TODO: Add enum class for questions

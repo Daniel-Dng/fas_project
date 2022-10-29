@@ -16,7 +16,7 @@ The project mainly relied on facial processing techniques of [MediaPipe](https:/
 
 ## Description
 After **WebRTC** connection successfully formed, there are challenge commands appear in the webcam asking client to 
-attempt to fulfill. After a certain of try numbers, the code will decide if the client pass the liveness test.
+attempt to fulfill. After a certain number of challenges, the code will decide if the client pass the liveness test.
 (There are parameters to constrain or relax the verification challenge)
 ### Instruction:
 * For simple test of challenge-response via direct Webcam, run [face_anti_spoofing.py](face_anti_spoofing.py):

@@ -5,7 +5,7 @@ import time
 import cv2
 from FaceAnalyzer import FaceAnalyzer
 import udfs
-from models import FaceModel
+from models import SimpleFaceModel
 # import imutils
 
 # parameters
@@ -83,13 +83,13 @@ for i_questions in range(0, limit_questions):
             ### HEAD POSE
             head_pose, xyz = udfs.get_face_pos(cap=cap, fa=fa)
             # Return FaceModel
-            face_instance = FaceModel(is_blink=is_blink,
-                                      total_blink=n_blinks,
-                                      xyz=xyz,
-                                      last_blink_duration=round(last_blink_duration, 4),
-                                      frame=frame_counter,
-                                      timestamp=datetime.now(),
-                                      head_pose=head_pose)
+            face_instance = SimpleFaceModel(is_blink=is_blink,
+                                            total_blink=n_blinks,
+                                            xyz=xyz,
+                                            last_blink_duration=round(last_blink_duration, 4),
+                                            frame=frame_counter,
+                                            timestamp=datetime.now(),
+                                            head_pose=head_pose)
 ########################################################################################################################
         TOTAL = face_instance.total_blink
         dif_blink = TOTAL - TOTAL_0
