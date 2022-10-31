@@ -25,7 +25,7 @@ lock = threading.Lock()
 # TODO:
 ## 1. changing limits from frames to seconds
 ## 2. Async Streamlit: https://gist.github.com/wfng92/0cc6673e9ce4e8b880e6a38c134ed0cf
-## 3. optimize speed
+## 3. optimize speed (when draw)
 
 def app_fas():
     col1, col2 = st.columns([3, 1])
@@ -34,9 +34,8 @@ def app_fas():
         record = st.checkbox("Record Video", value=False)
         draw_face = st.checkbox("Draw Face Mesh", value=False)
         limit_questions = st.slider("Total Challenges", min_value=1, max_value=10, step=1, value=10)
-        limit_try = st.slider("Limit Frame Attempts", min_value=0, max_value=150, step=1, value=100)
-        limit_consecutive_ok = st.slider("Number of OK Frames Required to Pass", min_value=0, max_value=10, step=1,
-                                         value=5)
+        limit_to_fail = st.slider("Number of Frames to Fail", min_value=0, max_value=150, step=1, value=100)
+        limit_to_pass = st.slider("Number of Frames Required to Pass", min_value=0, max_value=10, step=1, value=5)
     # Random Question List
     question_list = [questions.question_bank(random.randint(0, 4)) for i in range(0, limit_questions)]
     face_list = []
@@ -48,8 +47,8 @@ def app_fas():
                                     record=record,
                                     draw_face=draw_face,
                                     limit_questions=limit_questions,
-                                    limit_try=limit_try,
-                                    limit_consecutive_ok=limit_consecutive_ok,
+                                    limit_to_fail=limit_to_fail,
+                                    limit_to_pass=limit_to_pass,
                                     question_list=question_list,
                                     )
     face_instance = FaceModel(session_id=session_id)
@@ -68,7 +67,7 @@ def app_fas():
         # # Write Frames to Images
         # file_name = f"screenshots/video_frame_{face_instance.frame}.png"
         # cv2.imwrite(filename=file_name, img=img)
-        # Save all Face Instances
+        # # Save all Face Instances
         face_instance.create_mongo_instance()
         with lock:
             face_instance.frame += 1
@@ -76,7 +75,7 @@ def app_fas():
         # Process with FaceAnalyzer
         fa.process(img)
         # Control attempt for each challenge by limit number of frames
-        if face_instance.attempt < limit_try:
+        if face_instance.attempt < limit_to_fail:
             # Constrain by limit for number of questions
             if face_instance.question_counter <= limit_questions:
                 question = question_list[face_instance.question_index]
@@ -114,21 +113,18 @@ def app_fas():
                         logger.info(f"TOTAL BLINKS: {face_instance.total_blinks}")
                         blinks_up = 1
                     if face_instance.question_counter <= limit_questions:
-                        challenge_res = questions.challenge_result(question,
-                                                                   face_instance,
-                                                                   blinks_up)
-                        cv2.putText(img, f"{limit_try - face_instance.attempt}", (10, 100),
+                        challenge_res = questions.challenge_result(question, face_instance, blinks_up)
+                        cv2.putText(img, f"{limit_to_fail - face_instance.attempt}", (10, 100),
                                     cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 1)
                         if challenge_res == 'pass':
-                            cv2.putText(img,
-                                        f"{face_instance.question_counter}.{question}: OK"
+                            cv2.putText(img, f"{face_instance.question_counter}.{question}: OK"
                                         if question != 'blink eyes'
                                         else f"{face_instance.question_counter}.{question} {face_instance.blink_ok_required} times: OK",
                                         (10, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 2)
                             face_instance.attempt = 0
                             face_instance.consecutive_ok_counter += 1
-                            # Check if OK for enough frames (limit_consecutive_ok)
-                            if (face_instance.consecutive_ok_counter == limit_consecutive_ok) & (
+                            # Check if OK for enough frames (limit_to_pass)
+                            if (face_instance.consecutive_ok_counter == limit_to_pass) & (
                                     question != 'blink eyes'):
                                 # Flow for all questions, except eye blink
                                 logger.info("passed")
