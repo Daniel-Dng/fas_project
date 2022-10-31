@@ -49,8 +49,8 @@ class SessionModel(CustomBaseModel):
     record: bool
     draw_face: bool
     limit_questions: int
-    limit_try: int
-    limit_consecutive_ok: int
+    limit_to_fail: int
+    limit_to_pass: int
     question_list: list
     # Liveness Check Decision
     liveness: int = None
